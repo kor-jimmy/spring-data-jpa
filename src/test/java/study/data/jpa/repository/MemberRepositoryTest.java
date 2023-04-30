@@ -24,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
 @Rollback(value = false)
@@ -50,7 +51,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void basicCRUD() throws Exception{
+    public void basicCRUD() throws Exception {
         Member member1 = new Member("member1");
         Member member2 = new Member("member1");
         memberRepository.save(member1);
@@ -109,7 +110,7 @@ class MemberRepositoryTest {
             System.out.println("dto = " + dto);
         }
     }
-    
+
     @Test
     public void findByNames() {
         Member member1 = new Member("member1", 10);
@@ -150,9 +151,9 @@ class MemberRepositoryTest {
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
     }
-    
+
     @Test
-    public void bulkAgePlus () throws Exception{
+    public void bulkAgePlus() throws Exception {
         //given
         memberRepository.save(new Member("member1", 10));
         memberRepository.save(new Member("member2", 20));
@@ -162,13 +163,13 @@ class MemberRepositoryTest {
 
         //when
         int resultCount = memberRepository.bulkAgePlus(20);
-        
+
         //then
         assertThat(resultCount).isEqualTo(3);
     }
-    
+
     @Test
-    public void findMemberLazy() throws Exception{
+    public void findMemberLazy() throws Exception {
         //given
         // member1 -> teamA
         // member2 -> teamB
@@ -182,10 +183,10 @@ class MemberRepositoryTest {
         member2.setTeam(teamB);
         memberRepository.save(member1);
         memberRepository.save(member2);
-        
+
         em.flush();
         em.clear();
-        
+
         //when
         List<Member> members = memberRepository.findAll();
 
@@ -193,6 +194,33 @@ class MemberRepositoryTest {
             System.out.println("member.getUsername() = " + member.getUsername());
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
         }
+        //then
+    }
+
+    @Test
+    public void queryHint() throws Exception {
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findReadOnlyByUsername(member1.getUsername());
+        findMember.setUsername("member2");
+
+        em.flush();
+        //then
+    }
+
+    @Test
+    public void lockTest() throws Exception {
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findLockByUsername(member1.getUsername());
 
         //then
     }
