@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     /*
     * @Query 어노테이션의 장점은 정적 쿼리이기 때문에 어플리케이션 실행 당시 에러 확인 가능
